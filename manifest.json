@@ -1,10 +1,13 @@
 {
-	"name": "ModName",
+	"name": "CollectiveRewiring",
 	"version_number": "1.0.0",
-	"website_url": "",
-	"description": "ModDesc",
+	"website_url": "https://github.com/pseudopulse/CollectiveRewiring",
+	"description": "A collection of changes to content added by Alloyed Collective.",
 	"dependencies": [
 		"bbepis-BepInExPack-5.4.9",
-		"RiskofThunder-HookGenPatcher-1.2.1"
+		"RiskofThunder-HookGenPatcher-1.2.1",
+		"tristanmcpherson-R2API-5.0.5",
+		"pseudopulse-Rebindables-1.0.4",
+		"pseudopulse-SoundFixer-1.0.0"
 	]
 }

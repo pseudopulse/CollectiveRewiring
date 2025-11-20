@@ -1,4 +1,4 @@
 # libs and build directories
-ModName/bin
-ModName/obj
+CollectiveRewiring/bin
+CollectiveRewiring/obj
 build.sh
