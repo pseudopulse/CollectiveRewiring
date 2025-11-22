@@ -1,3 +1,6 @@
+# 1.1.1
+- Fixed Operator passive description gaining sentience. It will no longer cry for help.
+
 # 1.1.0
 - Reduced Operator's Nano-Bugged damage increase from 100% to 50%.
 - Operator's unique drones now inherit items.

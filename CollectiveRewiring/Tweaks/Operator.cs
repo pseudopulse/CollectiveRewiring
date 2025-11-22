@@ -221,7 +221,7 @@ namespace CollectiveRewiring {
                     }
                 };
 
-                Replace("DRONETECH_PASSIVE_DESCRIPTION", ".", " that <style=cIsUtility>inherit your items.</style>");
+                Replace("DRONETECH_PASSIVE_DESCRIPTION", "companions.", "companions that <style=cIsUtility>inherit your items.</style>");
             }
         }
 
