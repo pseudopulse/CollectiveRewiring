@@ -9,7 +9,6 @@ using R2API;
 using Rebindables;
 using RoR2BepInExPack.Utilities;
 using UnityEngine.UI;
-using Rebindables;
 
 namespace CollectiveRewiring {
     [ConfigSection("Tweaks :: Operator")]
@@ -19,6 +18,8 @@ namespace CollectiveRewiring {
         private static bool FollowerAttacks;
         [ConfigField("Allow Drone Cycling", "Lets you target select a drone via a rebindable key or cycle the queue without activating anything.", true)]
         private static bool AllowDroneCycling;
+        [ConfigField("No Drone Grab", "If Allow Drone Cycling is on, disables the functionality of targeting a drone.", false)]
+        private static bool NoGrab;
         [ConfigField("Drone Command ICD", "Adds a per-drone cooldown to commands. Drones on cooldown will not be valid in the queue and cannot be target grabbed. Cooldown is equal to your M2 cd. Recommended for balance when using target grabbing.", true)]
         private static bool UseDroneICD;
         [ConfigField("Better Queue UI", "Improves the Drone Queue UI.", true)]
@@ -37,6 +38,10 @@ namespace CollectiveRewiring {
         private static bool RequirePress;
         [ConfigField("OCR Damage", "The damage of Operator's M1 shot. Vanilla is 600", 1000)]
         private static float NanoPistolDamage;
+        [ConfigField("Nanobugged Damage Increase", "The damage increase against Nanobugged enemies. Vanilla is 100", 50)]
+        private static float NanoBugDamage;
+        [ConfigField("Unique Drones Copy Items", "Makes Operator's unique drones copy most items.", true)]
+        private static bool CopyItems;
         //
         public static ModKeybind DroneCycle = RebindAPI.RegisterModKeybind(new("OPERATOR_CYCLE".Add("Drone Queue Cycle (Operator)"), KeyCode.F, 10));
         public static void Initialize() {
@@ -146,11 +151,11 @@ namespace CollectiveRewiring {
                 };
             }
             
-            On.RoR2.DroneCommandReceiver.CommandActivate += OnDroneCommand;
             if (UseDroneICD) {
                 On.RoR2.Skills.DroneTechDroneSkillDef.IsReady += IsReady;
                 On.RoR2.DroneCommandReceiver.IsReady += InternalCD;
                 On.RoR2.DroneCommandReceiver.FixedUpdate += Recharge;
+                On.EntityStates.DroneTech.Weapon.Activate.OnEnter += OnDroneCommand;
             }
             On.DroneTechSurvivorUIController.FillSecondaryQueue += UpdateIcons;
             On.DroneTechController.FixedUpdate += DroneTechUpdate;
@@ -203,9 +208,89 @@ namespace CollectiveRewiring {
                 self.maxDamageCoefficient = NanoPistolDamage * 0.01f;
                 orig(self, x);
             };
+
+            IL.RoR2.NanoBugDebuffController.OnVictimDamaged += ReduceNanoBugDamage;
+            Replace(Paths.SkillDef.NanoBomb.keywordTokens[0], "100%", $"{NanoBugDamage}%");
+
+            if (CopyItems) {
+                On.RoR2.DroneRepairMaster.Start += (orig, self) => {
+                    orig(self);
+                    
+                    if (!self.GetComponent<CopyOwnerInventory>()) {
+                        self.AddComponent<CopyOwnerInventory>();
+                    }
+                };
+
+                Replace("DRONETECH_PASSIVE_DESCRIPTION", ".", " that <style=cIsUtility>inherit your items.</style>");
+            }
         }
+
+        private static void OnDroneCommand(On.EntityStates.DroneTech.Weapon.Activate.orig_OnEnter orig, EntityStates.DroneTech.Weapon.Activate self)
+        {
+            orig(self);
+
+            if (self.drone != null && self.drone.characterBody) {
+                DroneSkillData data = SkillMap.GetOrCreateValue(self.drone.characterBody.gameObject);
+                data.cooldown = 0f;
+                data.finalRecharge = self.skillLocator.secondary.finalRechargeInterval;
+            }            
+        }
+
+        private class CopyOwnerInventory : MonoBehaviour {
+            public Inventory ownerInventory;
+            public CharacterMaster self;
+            private ItemTag[] blacklistedTags = new ItemTag[] {
+                ItemTag.AIBlacklist, ItemTag.HoldoutZoneRelated, ItemTag.InteractableRelated, ItemTag.OnStageBeginEffect, ItemTag.PowerShape, ItemTag.DevotionBlacklist, ItemTag.ObjectiveRelated, ItemTag.ObliterationRelated
+            };
+
+            public void Start() {
+                self = GetComponent<CharacterMaster>();
+            }
+
+            public void FixedUpdate() {
+                if (!ownerInventory) {
+                    if (self.minionOwnership && self.minionOwnership.ownerMaster) {
+                        ownerInventory = self.minionOwnership.ownerMaster.inventory;
+                        ownerInventory.onInventoryChanged += MirrorInventory;
+                        MirrorInventory();
+                    }
+                }
+            }
+
+            private void MirrorInventory()
+            {
+                self.inventory.CopyItemsFrom(ownerInventory, ItemFilter);
+            }
+
+            private bool ItemFilter(ItemIndex index) {
+                ItemDef item = ItemCatalog.GetItemDef(index);
+                if (item.tier == ItemTier.NoTier) return false;
+
+                foreach (ItemTag tag in blacklistedTags) {
+                    if (item.ContainsTag(tag)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        private static void ReduceNanoBugDamage(ILContext il)
+        {
+            ILCursor c = new(il);
+            c.TryGotoNext(MoveType.After, x => x.MatchLdfld(out _), x => x.MatchLdarg(2), x => x.MatchLdfld(typeof(DamageInfo), nameof(DamageInfo.damage)));
+            c.EmitDelegate<Func<float, float>>((damage) => {
+                return damage * (NanoBugDamage * 0.01f);
+            });
+        }
+
         private static void Replace(SkillDef skill, string match, string replace) {
             CollectiveRewiring.LanguageLoadMap.Add(skill.skillDescriptionToken, (x) => x.Replace(match, replace));
+        }
+
+        private static void Replace(string token, string match, string replace) {
+            CollectiveRewiring.LanguageLoadMap.Add(token, (x) => x.Replace(match, replace));
         }
 
         private class RicochetSound : MonoBehaviour {
@@ -430,6 +515,14 @@ namespace CollectiveRewiring {
                 base.Start();
                 tech = GetComponent<DroneTechController>();
             }
+            public override Transform SearchForTarget()
+            {
+                if (NoGrab) {
+                    return null;
+                }
+
+                return base.SearchForTarget();
+            }
             public override bool Filter(HurtBox box)
             {
                 return box && (box.healthComponent.GetComponent<DroneCommandReceiver>()?.IsReady() ?? false) && box.healthComponent.body.GetOwnerBody() == body;
@@ -445,7 +538,7 @@ namespace CollectiveRewiring {
                 if (body && body.hasAuthority && inputBank.GetButtonState(DroneCycle).down && !inputTaken) {
                     inputTaken = true;
 
-                    if (targetBody) {
+                    if (targetBody && !NoGrab) {
                         tech.DroneQueue.RemoveAll(x => x.characterBody.bodyIndex == targetBody.bodyIndex);
                         var allCopies = tech.AllDrones.Where(x => x.characterBody.bodyIndex == targetBody.bodyIndex && x.characterBody != targetBody);
                         foreach (DroneInfo info in allCopies) {

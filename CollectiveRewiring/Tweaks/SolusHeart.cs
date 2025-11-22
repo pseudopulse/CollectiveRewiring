@@ -1,7 +1,7 @@
 using System;
 
 namespace CollectiveRewiring {
-    [ConfigSection("Tweaks :: SolusHeart")]
+    [ConfigSection("Tweaks :: Solus Heart")]
     public static class SolusHeart {
         [ConfigField("Prevent Accidental Ending Skip", "Only allows the downed Solus Heart to take damage from player skills and only from players close to it.", true)]
         private static bool AvoidAccidentalSkip;

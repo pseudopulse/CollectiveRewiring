@@ -7,14 +7,21 @@ A collection of tweaks to content added by Alloyed Collective. Everything is con
 - Gunner Drone (not CROSSHAIRS) damage per bullet increased to 125%
 - Drone Secondaries now have an internal cooldown equal to your Secondary cooldown (you will never cycle to a cooldown drone unless it is your only option)
 - Allows forcing a drone you are looking at to the front of the queue, and queues every duplicate copy of that drone in sequence afterward. Triggered via a customizable keybind.
-- Emergency Drone heal range reduced to 18m, but can be sent directly to an ally's position
+- Emergency Drone heal range reduced to 18m, but can be sent directly to an ally's position.
 - Command no longer empties all stocks in half a second if M2 is held.
-- Improves Drone Queue UI
+- Improves Drone Queue UI.
 - Adds extra SFX to OCR's kill ricochet.
 - Increases the max damage of OCR to 1000%
+- Reduces the damage of Nano-Bugged to +50%.
+- Operator's 2 starting drones now inherit (most) items.
 
 ## Wandering CHEF
 - Now appears on Commencement, Prime Meridian, and Void Locus (only if the DLC is enabled)
 
 ## Solus Heart
 - Rejecting the offering can now only be done with skill damage and only from players who are close by.
+
+## Neutronium Weight
+- Guaranteed to return to you. No longer drops onto the floor.
+- Passing the weight now deals 100% (+50% per stack) TOTAL damage, inheriting the properties of the triggering attack and inflicting Cripple.
+- The weight can no longer be passed to non-player allies and the weight will return to its proper owner both on kill (regardless of killer) and at the end of the stage.

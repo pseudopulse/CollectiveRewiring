@@ -23,7 +23,7 @@ namespace CollectiveRewiring {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "pseudopulse";
         public const string PluginName = "CollectiveRewiring";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.1.0";
         public static CollectiveRewiring instance;
 
         public static BepInEx.Logging.ManualLogSource ModLogger;
@@ -39,6 +39,7 @@ namespace CollectiveRewiring {
             Operator.Initialize();
             SolusHeart.Initialize();
             WanderingChef.Initialize();
+            NeutroniumWeight.Initialize();
 
             On.RoR2.Language.LoadAllTokensFromFolder += (orig, self, output) => {
                 orig(self, output);
@@ -55,6 +56,10 @@ namespace CollectiveRewiring {
 
         public static void RunCoro(IEnumerator coro) {
             instance.StartCoroutine(coro);
+        }
+
+        public static void Replace(string token, string match, string replace) {
+            CollectiveRewiring.LanguageLoadMap.Add(token, (x) => x.Replace(match, replace));
         }
 
         // kept for later
