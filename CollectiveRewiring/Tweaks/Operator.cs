@@ -240,7 +240,7 @@ namespace CollectiveRewiring {
             public Inventory ownerInventory;
             public CharacterMaster self;
             private ItemTag[] blacklistedTags = new ItemTag[] {
-                ItemTag.AIBlacklist, ItemTag.HoldoutZoneRelated, ItemTag.InteractableRelated, ItemTag.OnStageBeginEffect, ItemTag.PowerShape, ItemTag.DevotionBlacklist, ItemTag.ObjectiveRelated, ItemTag.ObliterationRelated
+                ItemTag.AIBlacklist, ItemTag.HoldoutZoneRelated, ItemTag.InteractableRelated, ItemTag.OnStageBeginEffect, ItemTag.PowerShape, ItemTag.DevotionBlacklist, ItemTag.ObjectiveRelated, ItemTag.ObliterationRelated, ItemTag.CannotCopy
             };
 
             public void Start() {
@@ -259,7 +259,11 @@ namespace CollectiveRewiring {
 
             private void MirrorInventory()
             {
+                int stacks = self.inventory.GetItemCountPermanent(DLC3Content.Items.DroneUpgradeHidden);
                 self.inventory.CopyItemsFrom(ownerInventory, ItemFilter);
+                if (stacks > 0) {
+                    self.inventory.GiveItemPermanent(DLC3Content.Items.DroneUpgradeHidden, stacks);
+                }
             }
 
             private bool ItemFilter(ItemIndex index) {
@@ -479,7 +483,7 @@ namespace CollectiveRewiring {
             }
 
             if (self.targetType.HasFlag(DroneCommandReceiver.TargetType.Self)) {
-                self.targetDistance = 60f;
+                self.targetDistance = 160f;
             }
         }
 

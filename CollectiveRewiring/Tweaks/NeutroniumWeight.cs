@@ -18,7 +18,6 @@ namespace CollectiveRewiring {
         //
         private static GameObject TransferDebuffOrbEffect;
         //
-        // todo: fix nullref, make in-flight orbs or weights on enemies return to owner at the end of stage
         private static List<WeightInfo> InFlightWeights = new();
         private static List<NeutroniumWeightHolder> HeldWeights = new();
         private class WeightInfo {

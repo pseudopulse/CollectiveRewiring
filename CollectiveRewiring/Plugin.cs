@@ -23,7 +23,7 @@ namespace CollectiveRewiring {
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "pseudopulse";
         public const string PluginName = "CollectiveRewiring";
-        public const string PluginVersion = "1.1.0";
+        public const string PluginVersion = "1.1.3";
         public static CollectiveRewiring instance;
 
         public static BepInEx.Logging.ManualLogSource ModLogger;

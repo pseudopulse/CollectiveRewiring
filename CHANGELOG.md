@@ -1,3 +1,11 @@
+# 1.1.3
+- Increased distance for targeting allies with Operator drone abilities.
+- Fixed "Unique Drones Inherit Items" preventing them from being upgraded.
+- SPEX now has the same damage requirements as downed Solus Heart.
+
+# 1.1.2
+- Fixed some missing tags in the drone inherit blacklist.
+
 # 1.1.1
 - Fixed Operator passive description gaining sentience. It will no longer cry for help.
 

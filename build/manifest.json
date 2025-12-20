@@ -1,6 +1,6 @@
 {
 	"name": "CollectiveRewiring",
-	"version_number": "1.1.1",
+	"version_number": "1.1.3",
 	"website_url": "https://github.com/pseudopulse/CollectiveRewiring",
 	"description": "A collection of changes to content added by Alloyed Collective.",
 	"dependencies": [
