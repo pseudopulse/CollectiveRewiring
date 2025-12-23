@@ -1,3 +1,7 @@
+# 1.1.4
+- Restored the recipes for elite aspects that were removed in the AC bugfix patch.
+- Fixed remaining issues involving Operator's unique drones losing some internal items due to inventory copy.
+
 # 1.1.3
 - Increased distance for targeting allies with Operator drone abilities.
 - Fixed "Unique Drones Inherit Items" preventing them from being upgraded.

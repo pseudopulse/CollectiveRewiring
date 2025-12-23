@@ -21,6 +21,26 @@ A collection of tweaks to content added by Alloyed Collective. Everything is con
 ## Solus Heart
 - Rejecting the offering can now only be done with skill damage and only from players who are close by.
 
+## SPEX
+- Same damage requirements as downed Solus Heart.
+
+## Crafting
+- Restores the recipes for elite aspects that got removed in the AC bugfix patch, with some modifications to fix DLC aspects being craftable from base-game items.
+<details>
+<summary>   Click to view recipes</summary>
+    Wake of Vultures +<br>
+        - Behemoth => Ifrit's Distinction<br>
+        - Unstable Tesla Coil => Silence Between Two Strikes<br>
+        - Frost Relic => Her Biting Embrace<br>
+        - Ben's Raincoat => His Reassurance<br>
+        - Growth Nectar => Aurelionite's Blessing<br>
+        - Happiest Mask => Spectral Circlet<br>
+        - Nkuhana's Opinion => Nkuhana's Retort<br>
+        - Purity => Shared Design<br>
+        - Longstanding Solitude => His Spiteful Boon<br>
+</details>
+
+
 ## Neutronium Weight
 - Guaranteed to return to you. No longer drops onto the floor.
 - Passing the weight now deals 100% (+50% per stack) TOTAL damage, inheriting the properties of the triggering attack and inflicting Cripple.

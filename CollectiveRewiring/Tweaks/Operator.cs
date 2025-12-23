@@ -239,6 +239,7 @@ namespace CollectiveRewiring {
         private class CopyOwnerInventory : MonoBehaviour {
             public Inventory ownerInventory;
             public CharacterMaster self;
+            private List<ItemInfo> LastOwnerInventoryState = new();
             private ItemTag[] blacklistedTags = new ItemTag[] {
                 ItemTag.AIBlacklist, ItemTag.HoldoutZoneRelated, ItemTag.InteractableRelated, ItemTag.OnStageBeginEffect, ItemTag.PowerShape, ItemTag.DevotionBlacklist, ItemTag.ObjectiveRelated, ItemTag.ObliterationRelated, ItemTag.CannotCopy
             };
@@ -259,11 +260,33 @@ namespace CollectiveRewiring {
 
             private void MirrorInventory()
             {
-                int stacks = self.inventory.GetItemCountPermanent(DLC3Content.Items.DroneUpgradeHidden);
+                List<ItemInfo> currentState = BuildInventoryState(self.inventory);
+                List<ItemInfo> ownerState = BuildInventoryState(ownerInventory);
                 self.inventory.CopyItemsFrom(ownerInventory, ItemFilter);
-                if (stacks > 0) {
-                    self.inventory.GiveItemPermanent(DLC3Content.Items.DroneUpgradeHidden, stacks);
+                
+                foreach (ItemInfo info in currentState) {
+                    if (self.inventory.GetItemCountPermanent(info.index) < info.count) {
+                        if (!(LastOwnerInventoryState.Where(x => x.index == info.index).Count() >= info.count && ownerState.Where(x => x.index == info.index).Count() < info.count)) {
+                            self.inventory.RemoveItemPermanent(info.index, self.inventory.GetItemCountPermanent(info.index));
+                            self.inventory.GiveItemPermanent(info.index, info.count);
+                        }
+                    }
                 }
+
+                LastOwnerInventoryState = ownerState;
+            }
+
+            private List<ItemInfo> BuildInventoryState(Inventory source) {
+                List<ItemInfo> list = new();
+
+                foreach (ItemIndex index in source.itemAcquisitionOrder) {
+                    list.Add(new() {
+                        index = index,
+                        count = source.GetItemCountPermanent(index)
+                    });
+                }
+
+                return list;
             }
 
             private bool ItemFilter(ItemIndex index) {
@@ -277,6 +300,11 @@ namespace CollectiveRewiring {
                 }
 
                 return true;
+            }
+
+            private class ItemInfo {
+                public ItemIndex index;
+                public int count;
             }
         }
 

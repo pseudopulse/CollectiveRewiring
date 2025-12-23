@@ -40,6 +40,7 @@ namespace CollectiveRewiring {
             SolusHeart.Initialize();
             WanderingChef.Initialize();
             NeutroniumWeight.Initialize();
+            AspectRecipes.Initialize();
 
             On.RoR2.Language.LoadAllTokensFromFolder += (orig, self, output) => {
                 orig(self, output);
