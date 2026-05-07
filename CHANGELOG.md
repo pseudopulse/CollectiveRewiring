@@ -1,3 +1,12 @@
+# 1.1.6
+- Fixed issue where Operator's drone item copy would incorrectly apply to Friendly Turrets and Turretlings from SnowtimeToybox
+
+
+# 1.1.5
+- I hate unity.
+- Fixed issue involving Operator drone item copy causing item duplication.
+- Damage with a proc coefficient higher than 0.4 now damages downed Solus Heart / SPEX even if no skill flag is set. Hopefully resolves some modded characters being unable to reject the offering if they werent updated for SOTS P1 patch.
+
 # 1.1.4
 - Restored the recipes for elite aspects that were removed in the AC bugfix patch.
 - Fixed remaining issues involving Operator's unique drones losing some internal items due to inventory copy.

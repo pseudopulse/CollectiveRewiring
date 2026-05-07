@@ -7,6 +7,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using R2API;
 using Rebindables;
+using RoR2.Items;
 using RoR2BepInExPack.Utilities;
 using UnityEngine.UI;
 
@@ -216,7 +217,7 @@ namespace CollectiveRewiring {
                 On.RoR2.DroneRepairMaster.Start += (orig, self) => {
                     orig(self);
                     
-                    if (!self.GetComponent<CopyOwnerInventory>()) {
+                    if (!self.GetComponent<CopyOwnerInventory>() && !self.gameObject.name.ToLower().Contains("friendlyturret") && !self.gameObject.name.ToLower().Contains("turretling")) {
                         self.AddComponent<CopyOwnerInventory>();
                     }
                 };
@@ -260,12 +261,16 @@ namespace CollectiveRewiring {
 
             private void MirrorInventory()
             {
+                if (!self || !self.inventory || !ownerInventory) {
+                    return;
+                }
+                
                 List<ItemInfo> currentState = BuildInventoryState(self.inventory);
                 List<ItemInfo> ownerState = BuildInventoryState(ownerInventory);
                 self.inventory.CopyItemsFrom(ownerInventory, ItemFilter);
                 
                 foreach (ItemInfo info in currentState) {
-                    if (self.inventory.GetItemCountPermanent(info.index) < info.count) {
+                    if (self.inventory.GetItemCountPermanent(info.index) < info.count && !CheckVoidCorruption(info.index, ownerState)) {
                         if (!(LastOwnerInventoryState.Where(x => x.index == info.index).Count() >= info.count && ownerState.Where(x => x.index == info.index).Count() < info.count)) {
                             self.inventory.RemoveItemPermanent(info.index, self.inventory.GetItemCountPermanent(info.index));
                             self.inventory.GiveItemPermanent(info.index, info.count);
@@ -274,6 +279,12 @@ namespace CollectiveRewiring {
                 }
 
                 LastOwnerInventoryState = ownerState;
+            }
+
+            private bool CheckVoidCorruption(ItemIndex original, List<ItemInfo> state) {
+                ItemIndex transformed = ContagiousItemManager.GetTransformedItemIndex(original);
+
+                return ItemCatalog.GetItemDef(transformed) != null;
             }
 
             private List<ItemInfo> BuildInventoryState(Inventory source) {
@@ -291,6 +302,7 @@ namespace CollectiveRewiring {
 
             private bool ItemFilter(ItemIndex index) {
                 ItemDef item = ItemCatalog.GetItemDef(index);
+                if (!item) return false;
                 if (item.tier == ItemTier.NoTier) return false;
 
                 foreach (ItemTag tag in blacklistedTags) {

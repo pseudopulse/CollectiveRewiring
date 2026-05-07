@@ -13,24 +13,20 @@ namespace CollectiveRewiring {
         private static void OnTakeDamage(On.RoR2.HealthComponent.orig_TakeDamageProcess orig, RoR2.HealthComponent self, RoR2.DamageInfo damageInfo)
         {
             if (AvoidAccidentalSkip && self.body && self.body.bodyIndex == SolusHeartDowned) {
-                if (damageInfo.damageType.damageSource == DamageSource.NoneSpecified) {
-                    goto skip;
-                }
-
                 if (!damageInfo.attacker || !damageInfo.attacker.GetComponent<CharacterBody>()) {
+                    damageInfo.rejected = true;
                     goto skip;
                 }
 
                 if (damageInfo.attacker.TryGetComponent<CharacterBody>(out var body)) {
                     if (!body.isPlayerControlled || Vector3.Distance(self.transform.position, body.transform.position) >= 30f) {
+                        damageInfo.rejected = true;
                         goto skip;
                     }
                 }
-
-                skip:
-                damageInfo.rejected = true;
             }
 
+            skip:
             orig(self, damageInfo);
         }
     }
